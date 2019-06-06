@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <base href="https://cdn.rawgit.com/download/polymer-cdn/2.6.0/lib/">
+    <script src="webcomponentsjs/webcomponents-loader.js"></script>
+    <link rel="import" href="iron-ajax/iron-ajax.html">
+    <link rel="import" href="polymer/polymer-element.html">
+    <title>Polymer</title>
+  </head>
+  <body>
+    <tablero-component><tablero-component>
+    <dom-module id="tablero-component">
+      <template>
+        <button type="button" name="button" on-click="lanzar">Lanzar</button>
+        <button type="button" name="button" on-click="reset">Reset</button>
+        <div class="tablero">
+          <div class="puntosHumanoMaquina">
+            <div class="puntosHumano">
+              Humanos
+              <ul>
+                <template is="dom-repeat" items="[[puntosHumano]]">
+                  <li>[[item]]</li>
+                </template>
+              </ul>
+            </div>
+            <div class="puntosMaquina">
+              Skynet
+              <ul>
+                <template is="dom-repeat" items="[[puntosMaquina]]">
+                  <li>[[item]]</li>
+                </template>
+              </ul>
+            </div>
+          </div>
+          <div class="tableroGanador">
+            [[ganador]]
+          </div>
+        </div>
+        <style>
+          .puntosHumanoMaquina{display:flex;width:100%;}
+          .puntosHumano{width: 50%;background-color: lightblue;}
+          .puntosMaquina{width: 50%;background-color: lightsalmon;}
+          .tableroGanador{width: 100%;text-align: center;background-color: lightgreen;}
+          .tablero{width: 100%; text-align: center;}
+          ul{list-style: none;}
+        </style>
+      </template>
+      <script>
+        class TableroComponent extends Polymer.Element{
+          static get is(){
+            return 'tablero-component';
+          }
+
+          static get properties(){
+            return {
+              puntosHumano:{type:Array,value:[]},
+              puntosMaquina:{type:Array,value:[]},
+              ganador:{type:String,value:"Esperando..."}
+            };
+          }
+
+          lanzar(){
+            let pM= this.getRandomArbitrary(1,6);
+            let pH= this.getRandomArbitrary(1,6);
+
+            this.push('puntosHumano', pH);
+            this.push('puntosMaquina', pM);
+            //this.notifyPath('puntosHumano',this.puntosHumano);
+            //this.notifyPath('puntosMaquina',this.puntosMaquina);
+
+            if(pH == pM)
+              this.ganador = "Empate!!";
+            else
+              this.ganador = pH > pM ? 'Ganaron los humanos!! :)' : 'Gano Skynet :(';
+
+            //this.notifyPath('ganador',this.ganador);
+          }
+
+          reset(){
+            this.puntosHumano = [];
+            this.puntosMaquina = [];
+            this.ganador = "Esperando...";
+            //this.notifyPath('puntosHumano',this.puntosHumano);
+            //this.notifyPath('puntosMaquina',this.puntosMaquina);
+            //this.notifyPath('ganador',this.ganador);
+          }
+
+          getRandomArbitrary(min, max) {return Math.round(Math.random() * (max - min) + min);}
+        }
+        customElements.define(TableroComponent.is, TableroComponent);
+      </script>
+    </dom-module>
+  </body>
+</html>
