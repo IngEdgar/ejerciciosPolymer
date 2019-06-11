@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>03 Cadena Balanceada</title>
+  </head>
+  <body>
+    Cadena: <input type="text" name="" value="" id="cadena" onkeypress="limitar(event)">
+    <br>
+    <button type="button" name="button" onclick="evaluar()" >Evaluar</button>
+    <h1 id="info">Ingrese un valor</h1>
+
+
+    <script type="text/javascript">
+    var cadena;
+    var balanceada = true;
+    var msg = document.getElementById('info');
+    function evaluar(){
+      cadena = document.getElementById('cadena').value;
+      if(cadena.length==0){
+        msg.innerText = "Ingrese un valor";
+        return;
+      }
+      if(cadena.startsWith('}') || cadena.endsWith('{'))
+        balanceada = false;
+      else
+        analizar(cadena);
+      msg.innerText = balanceada == true ? "Cadena balanceada" : "Cadena no balanceada";
+      balanceada = true;
+    }
+
+    function analizar(str){
+      let llavesApertura = [];
+      cadena = cadena.split('');
+      cadena.forEach(function(item){
+        if(item === '{')
+          llavesApertura.push('{');
+        if(item === '}'){
+          if(llavesApertura.length > 0)
+            llavesApertura.pop();
+          else
+              balanceada = false;
+        }
+      });
+    }
+
+    function limitar(e) {
+      console.log(e.keyCode);
+      if(e.keyCode != 125 && e.keyCode != 123){
+        e.preventDefault();
+      }
+    }
+    </script>
+  </body>
+</html>
