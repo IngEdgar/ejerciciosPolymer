@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <base href="https://cdn.rawgit.com/download/polymer-cdn/2.6.0/lib/">
+    <script src="webcomponentsjs/webcomponents-loader.js"></script>
+    <link rel="import" href="iron-ajax/iron-ajax.html">
+    <link rel="import" href="polymer/polymer-element.html">
+    <title>04 Ahorcado</title>
+  </head>
+  <body>
+    <comenzar-componente></comenzar-componente>
+<!----------------------------------------------------------------------------->
+    <dom-module id="comenzar-componente">
+      <template>
+        <template is="dom-if" if="[[!hideComenzar]]">
+          <juego-componente palabra-secreta-jugar="[[palabraSecreta]]"></juego-componente>
+        </template>
+        <template is="dom-if" if="[[hideComenzar]]">
+          Palabra Secreta: <input type="password" name="" value="{{palabraSecreta::input}}">
+          <br>
+          <button type="button" name="button" on-click="comenzar">Comenzar</button>
+          <br>
+          <p>[[msj]]</p>
+        </template>
+      </template>
+      <script>
+        class ComenzarComponente extends Polymer.Element{
+          static get is(){
+            return 'comenzar-componente';
+          }
+
+          static get properties(){
+            return {
+              palabraSecreta:{
+                type:String,
+                value:"",
+                observer:function(){
+                  //console.log(this.palabraSecreta)
+                }
+              },
+              hideComenzar:{type:Boolean, value:true},
+              msj:{type:String, value:""}
+            };
+          }
+
+          comenzar(){
+            if(this.palabraSecreta.length>0){
+              this.notifyPath('hideComenzar', false);
+            }else{
+              this.msj = "ingrese un valor";
+            }
+          }
+
+        }
+        customElements.define(ComenzarComponente.is, ComenzarComponente);
+      </script>
+    </dom-module>
+<!----------------------------------------------------------------------------->
+    <dom-module id="juego-componente">
+      <template>
+        <div style="display:flex;">
+          <div class="">
+            <h1>Adivina la palabra, tienes [[vidas]] intentos</h1>
+            <input type="text" name="" value="{{letra::input}}" maxlength=1>
+            <div>
+              <template is="dom-repeat" items="[[guiones]]">
+                <div class="letras" style="display:inline-block; font-size: 4em; color:black; font-style: italic;">[[item]]</div>
+              </template>
+            </div>
+            <br>
+            <h2>[[msjJuego]]</h2>
+            <button type="button" name="button" on-click="reset">Reset</button>
+          </div>
+          <div style="width:100px;"></div>
+          <canvas id="mycanvas" width="300" height="300" style="border: 2px solid black"></canvas>
+        </div>
+      </template>
+      <script>
+        class JuegoComponente extends Polymer.Element{
+          ready(){
+            super.ready();
+            this.palabraSecretaJugar = this.palabraSecretaJugar.toLowerCase();
+            this.vidas = 5;
+            this.guiones.length = this.palabraSecretaJugar.length;
+            this.guiones.fill('_');
+            this.canvas = new Ahorcado(this.$.mycanvas);
+          }
+
+          static get is(){
+            return 'juego-componente';
+          }
+
+          static get properties(){
+            return{
+              vidas: Number,
+              palabraSecretaJugar:{type:Array,value:[]},
+              guiones:{type:Array, value:[]},
+              letra: String,
+              msjJuego:String,
+              status:{type:Number, value: 0},
+              canvas:Object
+            };
+          }
+
+          static get observers(){
+            return['analizar(letra)'];
+          }
+
+          analizar(){
+            if(this.letra.length>0 && this.status != -1){
+              let idx = this.palabraSecretaJugar.indexOf(this.letra);
+              if(idx != -1){
+                //Mostrar la letra atinada
+                this.guiones[idx] = this.letra;
+                this.notifyPath(`guiones.${idx}`,this.letra);
+              }else{
+                this.vidas--;
+                //Aqui se codifica el dibujo ahorcandose
+                switch (this.vidas) {
+                  case 4:
+                    this.canvas.dibujarCabeza();
+                    break;
+                  case 3:
+                    this.canvas.dibujarCuerpo();
+                    break;
+                  case 2:
+                    this.canvas.dibujarPiernas();
+                    break;
+                  case 1:
+                    this.canvas.dibujarBrazos();
+                    break;
+                  case 5:
+                    this.canvas.dibujarCara();
+                    break;
+                }
+              }
+
+              //Perdió
+              if(this.vidas<1){
+                this.canvas.dibujarCara();
+                this.msjJuego = "Perdiste :(";
+                this.status = -1;
+                this.guiones = this.palabraSecretaJugar.split('');//Mostrar la palabra secreta
+                return;
+              }
+
+              //Ganó
+              if(!this.guiones.includes('_')){
+                this.msjJuego = "Felicidades Ganaste :)";
+                this.status = -1;
+              }
+            }
+          }
+
+          reset(){location.reload();}
+
+        }
+        customElements.define(JuegoComponente.is, JuegoComponente);
+
+        class Ahorcado{
+          constructor(documentCanvas){
+            this.canvas = documentCanvas;
+            this.ctx = this.canvas.getContext("2d");
+            this.dibujarAndamio();
+          }
+
+          dibujarAndamio(){
+            this.ctx.beginPath();
+            this.ctx.rect(290, 30, 8, 270);//poste
+            this.ctx.rect(150, 30, 148, 8);//trave
+            this.ctx.rect(150, 30, 8, 40);//palo
+            this.ctx.fillStyle = "#000";
+            this.ctx.fill();
+            this.ctx.closePath();
+          }
+
+          dibujarCabeza(){
+            this.ctx.beginPath();
+            this.ctx.arc(140, 90, 25, 0, Math.PI*2, false);
+            this.ctx.lineWidth = 5;
+            this.ctx.strokeStyle = "rgba(0, 0, 0, 1)";
+            this.ctx.stroke();
+            this.ctx.closePath();
+          }
+
+          dibujarCuerpo(){
+            this.ctx.beginPath();
+            this.ctx.rect(140, 113, 5, 100);
+            this.ctx.fillStyle = "#000";
+            this.ctx.fill();
+            this.ctx.closePath();
+          }
+
+          dibujarPiernas(){
+            this.ctx.beginPath();
+            this.ctx.moveTo(142,205);
+            this.ctx.lineTo(170, 260);
+            this.ctx.moveTo(142,205);
+            this.ctx.lineTo(120, 260);
+            this.ctx.lineWidth = 5;
+            this.ctx.stroke();
+            this.ctx.closePath();
+          }
+
+          dibujarBrazos(){
+            this.ctx.beginPath();
+            this.ctx.moveTo(142,130);
+            this.ctx.lineTo(170, 180);
+            this.ctx.moveTo(142,130);
+            this.ctx.lineTo(120, 180);
+            this.ctx.lineWidth = 5;
+            this.ctx.stroke();
+            this.ctx.closePath();
+          }
+
+          dibujarCara(){
+            this.ctx.beginPath();
+            this.ctx.moveTo(125,80);
+            this.ctx.lineTo(135,90);
+
+            this.ctx.moveTo(135,80);
+            this.ctx.lineTo(125,90);
+
+            this.ctx.moveTo(155,80);
+            this.ctx.lineTo(145,90);
+
+            this.ctx.moveTo(145,80);
+            this.ctx.lineTo(155,90);
+
+            this.ctx.lineWidth = 3;
+            this.ctx.stroke();
+            this.ctx.closePath();
+          }
+        }
+
+      </script>
+    </dom-module>
+
+  </body>
+</html>
