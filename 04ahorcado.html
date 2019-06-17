@@ -34,10 +34,7 @@
             return {
               palabraSecreta:{
                 type:String,
-                value:"",
-                observer:function(){
-                  //console.log(this.palabraSecreta)
-                }
+                value:""
               },
               hideComenzar:{type:Boolean, value:true},
               msj:{type:String, value:""}
@@ -59,13 +56,13 @@
 <!----------------------------------------------------------------------------->
     <dom-module id="juego-componente">
       <template>
-        <div style="display:flex;">
+        <div style="flex">
           <div class="">
             <h1>Adivina la palabra, tienes [[vidas]] intentos</h1>
             <input type="text" name="" value="{{letra::input}}" maxlength=1>
             <div>
               <template is="dom-repeat" items="[[guiones]]">
-                <div class="letras" style="display:inline-block; font-size: 4em; color:black; font-style: italic;">[[item]]</div>
+                <div class="letras">[[item]]</div>
               </template>
             </div>
             <br>
@@ -73,8 +70,18 @@
             <button type="button" name="button" on-click="reset">Reset</button>
           </div>
           <div style="width:100px;"></div>
-          <canvas id="mycanvas" width="300" height="300" style="border: 2px solid black"></canvas>
+          <canvas id="mycanvas" width="300" height="300"></canvas>
         </div>
+        <style media="screen">
+        .letras{
+          display:inline-block;
+          font-size: 4em;
+          color:black;
+          font-style: italic;
+        }
+        .flex{display:flex;}
+        #mycanvas{border: 2px solid black;}
+        </style>
       </template>
       <script>
         class JuegoComponente extends Polymer.Element{
@@ -130,15 +137,14 @@
                   case 1:
                     this.canvas.dibujarBrazos();
                     break;
-                  case 5:
+                  case 0:
                     this.canvas.dibujarCara();
-                    break;
+                  break;
                 }
               }
 
               //Perdió
               if(this.vidas<1){
-                this.canvas.dibujarCara();
                 this.msjJuego = "Perdiste :(";
                 this.status = -1;
                 this.guiones = this.palabraSecretaJugar.split('');//Mostrar la palabra secreta
@@ -233,7 +239,6 @@
             this.ctx.closePath();
           }
         }
-
       </script>
     </dom-module>
 
