@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <base href="https://cdn.rawgit.com/download/polymer-cdn/2.6.0/lib/">
+    <script src="webcomponentsjs/webcomponents-loader.js"></script>
+    <link rel="import" href="iron-ajax/iron-ajax.html">
+    <link rel="import" href="polymer/polymer-element.html">
+    <title>05 Calculadora Binaria</title>
+  </head>
+  <body>
+    <calculadora-polymer></calculadora-polymer>
+    <dom-module id="calculadora-polymer">
+      <template>
+        <div class="carcasa">
+          <input class="display" type="text" name="" value="[[display]]">
+          <div class="tablero">
+            <div class="alt60 flex">
+              <button class="boton" type="button" name="button" on-click="cero">0</button>
+              <button class="boton" type="button" name="button" on-click="uno">1</button>
+              <button class="boton" type="button" name="button" on-click="ce">C</button>
+              <button class="boton" type="button" name="button" on-click="igual">=</button>
+            </div>
+            <div class="alt60 flex">
+              <button class="boton" type="button" name="button" on-click="mas">+</button>
+              <button class="boton" type="button" name="button" on-click="menos">-</button>
+              <button class="boton" type="button" name="button" on-click="entre">/</button>
+              <button class="boton" type="button" name="button" on-click="por">*</button>
+            </div>
+          </div>
+        </div>
+        <style media="screen">
+          .flex{display: flex;}
+          .boton{width:60px;height:60px;margin:10px;}
+          .font20{font-size:20px;}
+          .display{
+            height:70px;
+            font-size:60px;
+            text-align:right;
+            padding:10px;
+            background-color:white;
+            margin:10px;
+            font-family:arial;
+            width: 277px;
+          }
+          .carcasa{
+            width:320px;
+            background-color:grey;
+            padding:10px;
+            margin-left:auto;
+            margin-right:auto;
+          }
+        </style>
+      </template>
+      <script>
+        class CalculadoraPolymer extends Polymer.Element{
+          static get is(){
+            return 'calculadora-polymer';
+          }
+          static get properties(){
+            return {
+                display:{type:String,value:""},
+                display_temporal:{type:String,value:"0"},
+                operador:{type:String,value:""}
+            };
+          }
+
+          cero(){this.display=this.display+"0";}
+          uno(){this.display=this.display+"1";}
+          ce(){this.display="";this.display_temporal="";this.operador="";}
+
+          igual(){
+            this.display = this.display == "" ? 0:this.display;
+            this.display_temporal = this.display_temporal == "" ? 0:this.display_temporal;
+            switch(this.operador){
+              case "+":
+                this.display = (parseInt(this.display,2) + parseInt(this.display_temporal,2)).toString(2);
+              break;
+              case "-":
+                this.display = (parseInt(this.display_temporal,2) - parseInt(this.display,2)).toString(2);
+              break;
+              case "/":
+                this.display = (parseInt(this.display_temporal,2) / parseInt(this.display,2)).toString(2);
+              break;
+              case "*":
+                this.display = (parseInt(this.display,2) * parseInt(this.display_temporal,2)).toString(2);
+              break;
+              default:
+                return;
+              break;
+            }
+
+          }
+          mas(){
+            this.clearDisplay();
+            this.operador = "+";
+          }
+          menos(){
+            this.clearDisplay();
+            this.operador = "-";
+          }
+          entre(){
+            this.clearDisplay();
+            this.operador = "/";
+          }
+          por(){
+            this.clearDisplay();
+            this.operador = "*";
+          }
+
+          clearDisplay(){
+            this.display_temporal = this.display;
+            this.display = "";
+          }
+        }
+        customElements.define(CalculadoraPolymer.is, CalculadoraPolymer);
+      </script>
+    </dom-module>
+  </body>
+</html>
