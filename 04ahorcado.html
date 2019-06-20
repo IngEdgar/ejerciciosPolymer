@@ -88,6 +88,7 @@
           ready(){
             super.ready();
             this.palabraSecretaJugar = this.palabraSecretaJugar.toLowerCase();
+            this.palabraSecretaMostrar = this.palabraSecretaJugar.toLowerCase();
             this.vidas = 5;
             this.guiones.length = this.palabraSecretaJugar.length;
             this.guiones.fill('_');
@@ -103,6 +104,7 @@
               vidas: Number,
               palabraSecretaJugar:{type:Array,value:[]},
               guiones:{type:Array, value:[]},
+              palabraSecretaMostrar:{type:String, value:""},
               letra: String,
               msjJuego:String,
               status:{type:Number, value: 0},
@@ -114,13 +116,24 @@
             return['analizar(letra)'];
           }
 
+          obtenerindices(letra){
+            let ok = false;
+            while(this.palabraSecretaJugar.indexOf(this.letra) != -1){
+              let idx = this.palabraSecretaJugar.indexOf(this.letra);
+              //Mostrar la letra atinada
+              this.guiones[idx] = this.letra;
+              this.notifyPath(`guiones.${idx}`,this.letra);
+              this.palabraSecretaJugar = this.palabraSecretaJugar.split('');
+              this.palabraSecretaJugar[idx] = "$";
+              this.palabraSecretaJugar = this.palabraSecretaJugar.join("");
+              ok = true;
+            }
+            return ok;
+          }
+
           analizar(){
             if(this.letra.length>0 && this.status != -1){
-              let idx = this.palabraSecretaJugar.indexOf(this.letra);
-              if(idx != -1){
-                //Mostrar la letra atinada
-                this.guiones[idx] = this.letra;
-                this.notifyPath(`guiones.${idx}`,this.letra);
+              if(this.obtenerindices(this.letra)){
               }else{
                 this.vidas--;
                 //Aqui se codifica el dibujo ahorcandose
@@ -147,7 +160,7 @@
               if(this.vidas<1){
                 this.msjJuego = "Perdiste :(";
                 this.status = -1;
-                this.guiones = this.palabraSecretaJugar.split('');//Mostrar la palabra secreta
+                this.guiones = this.palabraSecretaMostrar.split('');//Mostrar la palabra secreta
                 return;
               }
 
