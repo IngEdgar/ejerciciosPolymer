@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <base href="https://cdn.rawgit.com/download/polymer-cdn/2.6.0/lib/">
+    <script src="webcomponentsjs/webcomponents-loader.js"></script>
+    <link rel="import" href="iron-ajax/iron-ajax.html">
+    <link rel="import" href="polymer/polymer-element.html">
+    <title>06 Componente Anidados</title>
+  </head>
+  <body>
+    <componentepadre-polymer></componentepadre-polymer>
+    <dom-module id="componentepadre-polymer">
+      <template>
+        <div class="">
+          <h1>Componente Padre: [[msj]]</h1>
+          <input type="text" name="" value="{{msj::input}}">
+          <componentehijo-polymer msj2="{{msj}}"></componentehijo-polymer>
+          <componentehijo-polymer msj2="[[msj]]"></componentehijo-polymer>
+        </div>
+        <style>
+          div{background-color: lightblue;}
+        </style>
+      </template>
+      <script>
+        class ComponentePadrePolymer extends Polymer.Element{
+          static get is(){
+            return'componentepadre-polymer';
+          }
+          static get properties(){
+            return {
+              msj:{type:String, value:""}
+            }
+          }
+        }
+        customElements.define(ComponentePadrePolymer.is, ComponentePadrePolymer);
+      </script>
+    </dom-module>
+    <dom-module id="componentehijo-polymer">
+      <template>
+        <div>
+          <h2>Componente hijo: [[msj2]]</h2>
+          <input type="text" name="" value="{{msj2::input}}">
+        </div>
+        <style>
+          div{background-color: lightsalmon;}
+        </style>
+      </template>
+      <script>
+        class ComponenteHijoPolymer extends Polymer.Element{
+          static get is(){
+            return 'componentehijo-polymer';
+          }
+
+          static get properties(){
+            return {
+              msj2:{type:String, value:"",notify:true}
+            }
+          }
+        }
+        customElements.define(ComponenteHijoPolymer.is,ComponenteHijoPolymer);
+      </script>
+    </dom-module>
+  </body>
+</html>
