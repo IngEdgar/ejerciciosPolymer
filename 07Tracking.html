@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <base href="https://cdn.rawgit.com/download/polymer-cdn/2.6.0/lib/">
+    <script src="webcomponentsjs/webcomponents-loader.js"></script>
+    <link rel="import" href="iron-ajax/iron-ajax.html">
+    <link rel="import" href="polymer/polymer-element.html">
+    <link rel="import" href="polymer/lib/mixins/gesture-event-listeners.html">
+    <title>07 Tracking</title>
+  </head>
+  <body>
+    <tracking-element></tracking-element>
+    <dom-module id="tracking-element">
+      <template>
+        <p>Info: {{message}}</p>
+        <div id="contenedor" class="container" on-track="administrarTrack">
+          <div id="myelement" class="dragElement" on-track="administrarTrack" style$="position:relative;top:[[top]];left:[[left]];"></div>
+        </div>
+        <style>
+          :host .container{
+            width: 400px;
+            height: 400px;
+            background-color: cyan;
+            margin-left: auto;
+            margin-right: auto;
+          }
+          :host .dragElement{
+            width: 100px;
+            height: 100px;
+            background-color: red;
+          }
+        </style>
+      </template>
+      <script>
+      class TrackingElement extends Polymer.GestureEventListeners(Polymer.Element){
+        ready(){
+          super.ready();
+        }
+        static get is(){return "tracking-element";}
+        static get properties(){
+          return {message: String,top:String,left:String};
+        }
+        administrarTrack(e){
+          //To easy code:
+          let cb = this.shadowRoot.querySelector('#contenedor').getBoundingClientRect();
+          let cw = cb.width, ch = cb.height;
+          let cx = cb.x, cy = cb.y;
+          let eb = this.shadowRoot.querySelector('#myelement').getBoundingClientRect();
+          let ew = eb.width, eh = eb.height;
+          let ex = Math.ceil(e.detail.x), ey = Math.ceil(e.detail.y);
+
+          switch (e.detail.state) {
+            case 'start':
+              this.message = 'Tracking started!';
+            break;
+            case 'track':
+              //Delimiters
+              ex = (ex < cx) ? cx : ex;//leftLimit
+              ey = (ey < cy) ? cy : ey;//topLimit
+              ex = (ex > (cx + cw - ew)) ? (cx + cw - ew) : ex;//rightLimit
+              ey = (ey > (cy + ch - eh)) ? (cy + ch - eh) : ey;//bottomLimit
+              //set positions
+              this.top  = `${ey - cy}px`;
+              this.left = `${ex - cx}px`;
+              this.message = `Tracking in progress... ${ex}, ${ey}`;
+            break;
+            case 'end':
+              this.message = 'Tracking ended!';
+            break;
+          }
+        }
+      }
+      customElements.define(TrackingElement.is, TrackingElement);
+      </script>
+    </dom-module>
+  </body>
+</html>
