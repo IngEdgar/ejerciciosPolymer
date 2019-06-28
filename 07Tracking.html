@@ -34,9 +34,6 @@
       </template>
       <script>
       class TrackingElement extends Polymer.GestureEventListeners(Polymer.Element){
-        ready(){
-          super.ready();
-        }
         static get is(){return "tracking-element";}
         static get properties(){
           return {message: String,top:String,left:String};
