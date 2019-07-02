@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <base href="https://cdn.rawgit.com/download/polymer-cdn/2.6.0/lib/">
+    <script src="webcomponentsjs/webcomponents-loader.js"></script>
+    <link rel="import" href="iron-ajax/iron-ajax.html">
+    <link rel="import" href="polymer/polymer-element.html">
+    <title>08 Slots</title>
+  </head>
+  <body>
+    <polymer-component>
+      Simple Slot 1
+    </polymer-component>
+
+    <polymer-component msj="Hello from Simple Slot 2">
+      Simple Slot 2
+    </polymer-component>
+
+    <polymer-component msj="Hello from Simple Slot 3, Slot 1" msj_slot_dos="Hello again from Simple Slot 3, Slot 1">
+      Slot 3, <span slot="slot_uno">Slot Number 1</span>
+    </polymer-component>
+
+    <polymer-component msj="Hello from Simple Slot 4, Slot 2" msj_slot_dos="Hello again from Simple Slot 4, Slot 2" msj_slot_tres="Hello again and again from Simple Slot 4, Slot 2">
+      Slot 4, <span slot="slot_dos">Slot Number 2</span>
+    </polymer-component>
+    <dom-module id="polymer-component">
+      <template>
+        <br>
+        <div class="">
+          <slot></slot>
+          <slot name="slot_uno"></slot>
+          <slot name="slot_dos"></slot>
+          <p>MSJ Slot Simple 1: [[msj]]</p>
+          <p>MSJ Slot Simple 2: [[msj_slot_dos]]</p>
+          <p>MSJ Slot Simple 3: [[msj_slot_tres]]</p>
+        </div>
+        <style>div{border:1px solid blue;}</style>
+      </template>
+      <script>
+        class PolymerComponent extends Polymer.Element{
+          static get is(){
+            return 'polymer-component';
+          }
+
+          static get properties(){
+            return {
+              msj:{type:String, value:"No msg"},
+              msj_slot_dos:{type:String, value:"No msg"},
+              msj_slot_tres:{type:String, value:"No msg"}
+            }
+          }
+
+        }
+        customElements.define(PolymerComponent.is, PolymerComponent);
+      </script>
+    </dom-module>
+  </body>
+</html>
